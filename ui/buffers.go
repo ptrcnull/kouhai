@@ -721,15 +721,8 @@ func (bs *BufferList) DrawTimeline(screen tcell.Screen, x0, y0, nickColWidth int
 		}
 
 		if yi >= y0 {
-			if i == 0 || b.lines[i-1].At.Truncate(time.Minute) != line.At.Truncate(time.Minute) {
-				st := tcell.StyleDefault.Bold(true)
-				printTime(screen, x0, yi, st, line.At.Local())
-			}
-
-			identSt := tcell.StyleDefault.
-				Foreground(line.HeadColor).
-				Reverse(line.Highlight)
-			printIdent(screen, x0+7, yi, nickColWidth, Styled(line.Head, identSt))
+			st := tcell.StyleDefault.Bold(true)
+			printTime(screen, x0, yi, st, line.At.Local())
 		}
 
 		x := x1
