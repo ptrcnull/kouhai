@@ -43,15 +43,7 @@ func printNumber(screen tcell.Screen, x *int, y int, st tcell.Style, n int) {
 }
 
 func printTime(screen tcell.Screen, x int, y int, st tcell.Style, t time.Time) {
-	hr0 := rune(t.Hour()/10) + '0'
-	hr1 := rune(t.Hour()%10) + '0'
-	mn0 := rune(t.Minute()/10) + '0'
-	mn1 := rune(t.Minute()%10) + '0'
-	screen.SetContent(x+0, y, hr0, nil, st)
-	screen.SetContent(x+1, y, hr1, nil, st)
-	screen.SetContent(x+2, y, ':', nil, st)
-	screen.SetContent(x+3, y, mn0, nil, st)
-	screen.SetContent(x+4, y, mn1, nil, st)
+	printString(screen, &x, y, Styled(t.Format("15:04:05"), tcell.StyleDefault.Foreground(tcell.ColorGray)))
 }
 
 func clearArea(screen tcell.Screen, x0, y0, width, height int) {
