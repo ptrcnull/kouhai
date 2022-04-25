@@ -1463,12 +1463,18 @@ func (app *App) formatMessage(s *irc.Session, ev irc.MessageEvent) (buffer strin
 		body.WriteString(" ")
 		body.WriteStyledString(ui.IRCString(content))
 	} else {
+		body.SetStyle(tcell.StyleDefault.Foreground(headColor))
+		body.WriteString("<")
+		body.WriteString(head)
+		body.WriteString(">")
+		body.SetStyle(tcell.StyleDefault)
+		body.WriteString(" ")
 		body.WriteStyledString(ui.IRCString(content))
 	}
 
 	line = ui.Line{
 		At:        ev.Time,
-		Head:      head,
+		Head:      "",
 		HeadColor: headColor,
 		Notify:    notification,
 		Body:      body.StyledString(),
