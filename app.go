@@ -126,6 +126,8 @@ type App struct {
 	lastNetID     string
 	lastBuffer    string
 
+	bufferBeforeCyclingUnread int
+
 	monitor map[string]map[string]struct{} // set of targets we want to monitor per netID, best-effort. netID->target->{}
 
 	networkLock sync.RWMutex        // locks networks
@@ -173,6 +175,8 @@ func NewApp(cfg Config) (app *App, err error) {
 		cfg:                cfg,
 		messageBounds:      map[boundKey]bound{},
 		monitor:            make(map[string]map[string]struct{}),
+
+		bufferBeforeCyclingUnread: -1,
 	}
 
 	if cfg.Highlights != nil {
@@ -967,6 +971,16 @@ func (app *App) handleKeyEvent(ev vaxis.Key) {
 		app.win.GoToBufferNo(7)
 	} else if keyMatches(ev, '9', vaxis.ModAlt) || keyMatches(ev, vaxis.KeyKeyPad9, vaxis.ModAlt) {
 		app.win.GoToBufferNo(8)
+	} else if keyMatches(ev, 'a', vaxis.ModAlt) {
+		cur := app.win.CurrentBufferID()
+		if app.win.GoToNextUnread() {
+			if app.bufferBeforeCyclingUnread == -1 {
+				app.bufferBeforeCyclingUnread = cur
+			}
+		} else {
+			app.win.GoToBufferNo(app.bufferBeforeCyclingUnread)
+			app.bufferBeforeCyclingUnread = -1
+		}
 	}
 }
 
