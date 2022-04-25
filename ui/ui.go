@@ -112,6 +112,10 @@ func (ui *UI) CurrentBuffer() (netID, title string) {
 	return ui.bs.Current()
 }
 
+func (ui *UI) CurrentBufferID() int {
+	return ui.bs.current
+}
+
 func (ui *UI) NextBuffer() {
 	ui.bs.Next()
 	ui.memberOffset = 0
@@ -136,6 +140,16 @@ func (ui *UI) GoToBufferNo(i int) {
 	if ui.bs.To(i) {
 		ui.memberOffset = 0
 	}
+}
+
+func (ui *UI) GoToNextUnread() bool {
+	for i, buffer := range ui.bs.list {
+		if buffer.unread {
+			ui.GoToBufferNo(i)
+			return true
+		}
+	}
+	return false
 }
 
 func (ui *UI) ShowBufferNumbers(enable bool) {
