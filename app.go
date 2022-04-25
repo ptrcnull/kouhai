@@ -100,6 +100,8 @@ type App struct {
 	lastNetID     string
 	lastBuffer    string
 
+	bufferBeforeCyclingUnread int
+
 	monitor map[string]map[string]struct{} // set of targets we want to monitor per netID, best-effort. netID->target->{}
 
 	networkLock sync.RWMutex        // locks networks
@@ -134,6 +136,8 @@ func NewApp(cfg Config) (app *App, err error) {
 		cfg:           cfg,
 		messageBounds: map[boundKey]bound{},
 		monitor:       make(map[string]map[string]struct{}),
+
+		bufferBeforeCyclingUnread: -1,
 	}
 
 	if cfg.Highlights != nil {
@@ -733,6 +737,16 @@ func (app *App) handleKeyEvent(ev *tcell.EventKey) {
 				app.win.ScrollUpHighlight()
 			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 				app.win.GoToBufferNo(int(ev.Rune()-'0') - 1)
+			case 'a':
+				cur := app.win.CurrentBufferID()
+				if app.win.GoToNextUnread() {
+					if app.bufferBeforeCyclingUnread == -1 {
+						app.bufferBeforeCyclingUnread = cur
+					}
+				} else {
+					app.win.GoToBufferNo(app.bufferBeforeCyclingUnread)
+					app.bufferBeforeCyclingUnread = -1
+				}
 			}
 		} else {
 			app.win.InputRune(ev.Rune())
