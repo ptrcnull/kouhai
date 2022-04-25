@@ -364,6 +364,14 @@ func (bs *BufferList) AddLine(netID, title string, notify NotifyType, line Line)
 		line.Body = line.Body.ParseURLs()
 	}
 
+	if notify != NotifyNone && b != current && !b.unread {
+		b.lines = append(b.lines, Line{
+			At:   time.Now(),
+			Body: Styled("---", tcell.StyleDefault.Foreground(tcell.ColorRed)),
+		})
+		b.unread = true
+	}
+
 	if line.Mergeable && n != 0 && b.lines[n-1].Mergeable {
 		l := &b.lines[n-1]
 		if !bs.mergeLine(l, line) {
@@ -378,9 +386,6 @@ func (bs *BufferList) AddLine(netID, title string, notify NotifyType, line Line)
 		}
 	}
 
-	if notify != NotifyNone && b != current {
-		b.unread = true
-	}
 	if notify == NotifyHighlight && b != current {
 		b.highlights++
 	}
