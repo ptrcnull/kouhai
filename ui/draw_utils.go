@@ -250,15 +250,10 @@ func printDate(vx *Vaxis, x int, y int, st vaxis.Style, t time.Time) {
 }
 
 func printTime(vx *Vaxis, x int, y int, st vaxis.Style, t time.Time) {
-	hr0 := rune(t.Hour()/10) + '0'
-	hr1 := rune(t.Hour()%10) + '0'
-	mn0 := rune(t.Minute()/10) + '0'
-	mn1 := rune(t.Minute()%10) + '0'
-	setCell(vx, x+0, y, hr0, st)
-	setCell(vx, x+1, y, hr1, st)
-	setCell(vx, x+2, y, ':', st)
-	setCell(vx, x+3, y, mn0, st)
-	setCell(vx, x+4, y, mn1, st)
+	style := vaxis.Style{
+		Foreground: ColorGray,
+	}
+	printString(vx, &x, y, Styled(t.Format("15:04:05"), style))
 }
 
 func clearArea(vx *Vaxis, x0, y0, width, height int) {

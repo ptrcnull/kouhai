@@ -1105,7 +1105,7 @@ func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
 			ri += len([]rune(s))
 		}
 		w := stringWidth(bs.ui.vx, string(sr[ri:]))
-		if w <= bs.tlInnerWidth+nickColWidth+9-16 {
+		if w <= bs.tlInnerWidth+9-16 {
 			b.topicOffset -= 12
 			if b.topicOffset < 0 {
 				b.topicOffset = 0
@@ -1212,55 +1212,10 @@ func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
 			continue
 		}
 
-		showDate := bs.shouldShowDate(b, i, yi, y0)
-		if showDate {
-			st := vaxis.Style{
-				Attribute: vaxis.AttrBold,
-			}
-			// as a special case, always draw the first visible message date, even if it is a continuation line
-			yd := yi
-			if yd < y0 {
-				yd = y0
-			}
-			printDate(vx, x0, yd, st, line.At.Local())
-		} else {
-			showTime := b.lines[i-1].At.Truncate(time.Minute) != line.At.Truncate(time.Minute) && yi >= y0
-			if !showTime {
-				// also try to show the time if we previously drew the date
-				yp := yi - (len(b.lines[i-1].NewLines(bs.ui.vx, bs.textWidth)) + 1)
-				showTime = i == 0 || bs.shouldShowDate(b, i-1, yp, y0)
-			}
-			if showTime {
-				st := vaxis.Style{
-					Foreground: bs.ui.config.Colors.Gray,
-				}
-				printTime(vx, x0, yi, st, line.At.Local())
-			}
-		}
-
 		if yi >= y0 {
-			identSt := vaxis.Style{
-				Foreground: line.HeadColor,
-			}
-			if line.Highlight {
-				identSt.Attribute |= vaxis.AttrReverse
-			}
-			xb, xe := printIdent(vx, x0+7, yi, nickColWidth, Styled(line.Head, identSt))
-
-			if !strings.HasSuffix(line.Head, "--") && !strings.HasSuffix(line.Head, "!!") {
-				ui.clickEvents = append(ui.clickEvents, clickEvent{
-					xb: xb,
-					xe: xe,
-					y:  yi,
-					event: &events.EventClickNick{
-						EventClick: events.EventClick{
-							NetID:  b.netID,
-							Buffer: b.title,
-						},
-						Nick: line.Head,
-					},
-				})
-			}
+			printTime(vx, x0, yi, vaxis.Style{
+				Attribute: vaxis.AttrBold,
+			}, line.At.Local())
 		}
 
 		x := x1
