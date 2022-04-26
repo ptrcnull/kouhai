@@ -350,6 +350,15 @@ func (bs *BufferList) mergeLine(former *Line, addition Line) (keepLine bool) {
 	return true
 }
 
+func (bs *BufferList) SetUnread(netID, title string) {
+	_, b := bs.at(netID, title)
+	if b == nil {
+		return
+	}
+
+	b.unread = true
+}
+
 func (bs *BufferList) AddLine(netID, title string, notify NotifyType, line Line) {
 	_, b := bs.at(netID, title)
 	if b == nil {
@@ -369,7 +378,7 @@ func (bs *BufferList) AddLine(netID, title string, notify NotifyType, line Line)
 			At:   time.Now(),
 			Body: Styled("---", tcell.StyleDefault.Foreground(tcell.ColorRed)),
 		})
-		b.unread = true
+		bs.SetUnread(netID, title)
 	}
 
 	if line.Mergeable && n != 0 && b.lines[n-1].Mergeable {
