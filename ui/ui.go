@@ -281,6 +281,26 @@ func (ui *UI) AddLines(netID, buffer string, before, after []Line) {
 	ui.bs.AddLines(netID, buffer, before, after)
 }
 
+func (ui *UI) SetBufferUnread(netID, title string) {
+	ui.bs.SetUnread(netID, title)
+}
+
+func (ui *UI) GetUnreads() map[string]time.Time {
+	unreads := map[string]time.Time{}
+	for _, b := range ui.bs.list {
+		if b.unread {
+			var marker time.Time
+			for _, line := range b.lines {
+				if line.Body.String() == "---" {
+					marker = line.At.Add(-time.Second)
+				}
+			}
+			unreads[b.netID+" "+b.title] = marker
+		}
+	}
+	return unreads
+}
+
 func (ui *UI) JumpBuffer(sub string) bool {
 	subLower := strings.ToLower(sub)
 	for i, b := range ui.bs.list {

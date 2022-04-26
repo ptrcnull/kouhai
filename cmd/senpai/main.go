@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -48,6 +49,7 @@ func main() {
 	lastNetID, lastBuffer := getLastBuffer()
 	app.SwitchToBuffer(lastNetID, lastBuffer)
 	app.SetLastClose(getLastStamp())
+	app.SetUnreads(getUnreads())
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -61,6 +63,7 @@ func main() {
 	app.Close()
 	writeLastBuffer(app)
 	writeLastStamp(app)
+	writeUnreads(app)
 }
 
 func cachePath() string {
@@ -129,5 +132,29 @@ func writeLastStamp(app *senpai.App) {
 	err := os.WriteFile(lastStampPath, []byte(last.Format(time.RFC3339Nano)), 0666)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to write last stamp at %q: %s\n", lastStampPath, err)
+	}
+}
+
+func unreadsPath() string {
+	return path.Join(cachePath(), "unreads.txt")
+}
+
+func getUnreads() map[string]time.Time {
+	unreads := map[string]time.Time{}
+
+	buf, err := ioutil.ReadFile(unreadsPath())
+	if err != nil {
+		return unreads
+	}
+
+	_ = json.Unmarshal(buf, &unreads)
+	return unreads
+}
+
+func writeUnreads(app *senpai.App) {
+	data, _ := json.Marshal(app.GetUnreads())
+	err := ioutil.WriteFile(unreadsPath(), data, 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to write unreads: %s\n", err)
 	}
 }

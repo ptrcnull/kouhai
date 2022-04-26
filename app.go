@@ -103,6 +103,7 @@ type App struct {
 
 	lastMessageTime time.Time
 	lastCloseTime   time.Time
+	unreads         map[string]time.Time
 }
 
 func NewApp(cfg Config) (app *App, err error) {
@@ -883,6 +884,7 @@ func (app *App) handleIRCEvent(netID string, ev interface{}) {
 		var linesBefore []ui.Line
 		var linesAfter []ui.Line
 		bounds, hasBounds := app.messageBounds[boundKey{netID, ev.Target}]
+		setUnread := false
 		for _, m := range ev.Messages {
 			var line ui.Line
 			switch ev := m.(type) {
@@ -894,6 +896,20 @@ func (app *App) handleIRCEvent(netID string, ev interface{}) {
 			if line.IsZero() {
 				continue
 			}
+			// if line has been added while offline
+			wasUnread := false
+			if unreadMarker, ok := app.unreads[netID+" "+ev.Target]; ok {
+				wasUnread = line.At.After(unreadMarker)
+			}
+			if (line.At.After(app.lastCloseTime) || wasUnread) && !setUnread {
+				setUnread = true
+				linesBefore = append(linesBefore, ui.Line{
+					At:   line.At,
+					Body: ui.Styled("---", tcell.StyleDefault.Foreground(tcell.ColorRed)),
+				})
+				app.win.SetBufferUnread(netID, ev.Target)
+			}
+
 			if hasBounds {
 				c := bounds.Compare(&line)
 				if c < 0 {
@@ -1408,4 +1424,12 @@ func (app *App) printTopic(netID, buffer string) (ok bool) {
 		Body:      ui.Styled(body, tcell.StyleDefault.Foreground(tcell.ColorGray)),
 	})
 	return true
+}
+
+func (app *App) SetUnreads(unreads map[string]time.Time) {
+	app.unreads = unreads
+}
+
+func (app *App) GetUnreads() map[string]time.Time {
+	return app.win.GetUnreads()
 }
