@@ -1369,7 +1369,7 @@ func (app *App) handleIRCEvent(netID string, ev interface{}) {
 			break
 		}
 		var body ui.StyledStringBuilder
-		body.WriteString(fmt.Sprintf("%s\u2192%s", ev.FormerNick, s.Nick()))
+		body.WriteString(fmt.Sprintf("%s->%s", ev.FormerNick, s.Nick()))
 		textStyle := vaxis.Style{
 			Foreground: app.cfg.Colors.Status,
 		}
@@ -1870,7 +1870,7 @@ func (app *App) formatEvent(ev irc.Event) ui.Line {
 	switch ev := ev.(type) {
 	case irc.UserNickEvent:
 		var body ui.StyledStringBuilder
-		body.WriteString(fmt.Sprintf("%s\u2192%s", ev.FormerNick, ev.User))
+		body.WriteString(fmt.Sprintf("%s->%s", ev.FormerNick, ev.User))
 		textStyle := vaxis.Style{
 			Foreground: app.cfg.Colors.Status,
 		}
