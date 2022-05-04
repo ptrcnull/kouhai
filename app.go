@@ -1237,8 +1237,8 @@ func (app *App) formatMessage(s *irc.Session, ev irc.MessageEvent) (buffer strin
 	if isAction || isNotice {
 		head = "*"
 	} else {
-		head = "<" + head + ">"
 		headColor = identColor(head)
+		head = "<" + head + ">"
 	}
 
 	content := strings.TrimSuffix(ev.Content, "\x01")
