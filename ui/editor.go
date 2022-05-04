@@ -453,7 +453,12 @@ func (e *Editor) Draw(screen tcell.Screen, x0, y int) {
 		if e.backsearch && i < e.cursorIdx && i >= e.cursorIdx-len(e.backsearchPattern) {
 			s = s.Underline(true)
 		}
-		screen.SetContent(x, y, r, nil, s)
+		if r == '\n' {
+			style := tcell.StyleDefault.Background(tcell.ColorRed).Foreground(tcell.ColorBlack)
+			screen.SetCell(x, y, style, 'N')
+		} else {
+			screen.SetContent(x, y, r, nil, s)
+		}
 		x += runeWidth(r)
 		i++
 	}

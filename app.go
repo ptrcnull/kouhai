@@ -657,17 +657,23 @@ func (app *App) handleKeyEvent(ev *tcell.EventKey) {
 	case tcell.KeyF8:
 		app.win.ToggleMemberList()
 	case tcell.KeyCR, tcell.KeyLF:
+		if app.pasting {
+			app.win.InputRune('\n')
+			break
+		}
 		netID, buffer := app.win.CurrentBuffer()
 		input := app.win.InputEnter()
-		err := app.handleInput(buffer, input)
-		if err != nil {
-			app.win.AddLine(netID, buffer, ui.Line{
-				At:        time.Now(),
-				Head:      "!!",
-				HeadColor: tcell.ColorRed,
-				Notify:    ui.NotifyUnread,
-				Body:      ui.PlainSprintf("%q: %s", input, err),
-			})
+		for _, part := range strings.Split(input, "\n") {
+			err := app.handleInput(buffer, part)
+			if err != nil {
+				app.win.AddLine(netID, buffer, ui.Line{
+					At:        time.Now(),
+					Head:      "!!",
+					HeadColor: tcell.ColorRed,
+					Notify:    ui.NotifyUnread,
+					Body:      ui.PlainSprintf("%q: %s", part, err),
+				})
+			}
 		}
 	case tcell.KeyRune:
 		if ev.Modifiers() == tcell.ModAlt {
