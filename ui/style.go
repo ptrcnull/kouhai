@@ -17,6 +17,9 @@ import (
 var condition = runewidth.Condition{}
 
 func runeWidth(r rune) int {
+	if r == '\n' {
+		return 1
+	}
 	return condition.RuneWidth(r)
 }
 
