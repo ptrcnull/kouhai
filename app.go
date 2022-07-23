@@ -1461,9 +1461,21 @@ func (app *App) formatMessage(s *irc.Session, ev irc.MessageEvent) (buffer strin
 
 	head := ev.User
 	headColor := tcell.ColorWhite
+	level := ""
+	levelColor := tcell.ColorWhite
 	if isAction || isNotice {
 		head = "*"
 	} else {
+		currentMembers := s.Names(buffer)
+		for _, member := range currentMembers {
+			if member.Name.Name == head {
+				level = member.PowerLevel
+				if level == "+" {
+					levelColor = tcell.ColorDarkGray
+				}
+			}
+		}
+
 		headColor = ui.IdentColor(app.cfg.Colors.Nicks, head, isFromSelf)
 	}
 
@@ -1485,6 +1497,11 @@ func (app *App) formatMessage(s *irc.Session, ev irc.MessageEvent) (buffer strin
 	} else {
 		body.SetStyle(tcell.StyleDefault.Foreground(headColor))
 		body.WriteString("<")
+		if level != "" {
+			body.SetStyle(tcell.StyleDefault.Foreground(levelColor))
+			body.WriteString(level)
+		}
+		body.SetStyle(tcell.StyleDefault.Foreground(headColor))
 		body.WriteString(head)
 		body.WriteString(">")
 		body.SetStyle(tcell.StyleDefault)
