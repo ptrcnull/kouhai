@@ -1617,9 +1617,21 @@ func (app *App) formatMessage(s *irc.Session, ev irc.MessageEvent) (buffer strin
 
 	head := ev.User
 	headColor := vaxis.IndexColor(15)
+	level := ""
+	levelColor := vaxis.IndexColor(15)
 	if isAction || isNotice {
 		head = "*"
 	} else {
+		currentMembers := s.Names(buffer)
+		for _, member := range currentMembers {
+			if member.Name.Name == head {
+				level = member.PowerLevel
+				if level == "+" {
+					levelColor = vaxis.IndexColor(14)
+				}
+			}
+		}
+
 		headColor = ui.IdentColor(app.cfg.Colors.Nicks, head, isFromSelf)
 	}
 
@@ -1645,6 +1657,11 @@ func (app *App) formatMessage(s *irc.Session, ev irc.MessageEvent) (buffer strin
 	} else {
 		body.SetStyle(vaxis.Style{Foreground: headColor})
 		body.WriteString("<")
+		if level != "" {
+			body.SetStyle(vaxis.Style{Foreground: levelColor})
+			body.WriteString(level)
+		}
+		body.SetStyle(vaxis.Style{Foreground: headColor})
 		body.WriteString(head)
 		body.WriteString(">")
 		body.SetStyle(vaxis.Style{})
