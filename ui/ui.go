@@ -19,7 +19,6 @@ import (
 )
 
 type Config struct {
-	NickColWidth      int
 	ChanColWidth      int
 	ChanColEnabled    bool
 	MemberColWidth    int
@@ -693,7 +692,7 @@ func (ui *UI) InputBackSearch() {
 func (ui *UI) Resize() {
 	ui.vx.window = ui.vx.Window() // Refresh window size
 	w, h := ui.vx.window.Size()
-	innerWidth := w - 9 - ui.channelWidth - ui.config.NickColWidth - ui.memberWidth
+	innerWidth := w - 9 - ui.channelWidth - ui.memberWidth
 	if innerWidth <= 0 {
 		innerWidth = 1 // will break display somewhat, but this is an edge case
 	}
@@ -768,7 +767,7 @@ func (ui *UI) Draw(members []irc.Member) {
 
 	w, h := ui.vx.window.Size()
 
-	ui.bs.DrawTimeline(ui, ui.channelWidth, 0, ui.config.NickColWidth)
+	ui.bs.DrawTimeline(ui, ui.channelWidth, 0)
 	if ui.channelWidth == 0 {
 		ui.bs.DrawHorizontalBufferList(ui.vx, 0, h-1, w-ui.memberWidth, &ui.channelOffset)
 	} else {
@@ -783,33 +782,21 @@ func (ui *UI) Draw(members []irc.Member) {
 		ui.drawStatusBar(ui.channelWidth, h-2, w-ui.channelWidth-ui.memberWidth)
 	}
 
-	prompt := ui.prompt
-	if ui.bs.HasOverlay() && ui.e.Empty() {
-		prompt = Styled(">", vaxis.Style{
-			Foreground: ui.config.Colors.Prompt,
-		})
-	}
+	promptX := ui.channelWidth
+	editorX := promptX + 9 // width of time column
+	editorY := h - 1
+	statusBarY := h - 2
+	// if vertical, move editor and status 1 up
 	if ui.channelWidth == 0 {
-		for x := 0; x < 9+ui.config.NickColWidth; x++ {
-			setCell(ui.vx, x, h-2, ' ', vaxis.Style{})
-		}
-		printIdent(ui.vx, 7, h-2, ui.config.NickColWidth, prompt)
-	} else {
-		for x := ui.channelWidth; x < 9+ui.channelWidth+ui.config.NickColWidth; x++ {
-			setCell(ui.vx, x, h-1, ' ', vaxis.Style{})
-		}
-		printIdent(ui.vx, ui.channelWidth+7, h-1, ui.config.NickColWidth, prompt)
+		editorY -= 1
+		statusBarY -= 1
 	}
-
+	printString(ui.vx, &promptX, editorY, Styled("       > ", vaxis.Style{Foreground: vaxis.IndexColor(9)}))
 	var hint string
 	if ui.bs.HasOverlay() {
 		hint = ui.overlayHint
 	}
-	if ui.channelWidth == 0 {
-		ui.e.Draw(ui.vx, 9+ui.config.NickColWidth, h-2, hint)
-	} else {
-		ui.e.Draw(ui.vx, 9+ui.channelWidth+ui.config.NickColWidth, h-1, hint)
-	}
+	ui.e.Draw(ui.vx, editorX, editorY, hint)
 
 	if ui.image != nil {
 		iw, ih := ui.image.CellSize()
@@ -864,7 +851,7 @@ func (ui *UI) drawStatusBar(x0, y, width int) {
 	})
 	s.WriteString("--")
 
-	x := x0 + 5 + ui.config.NickColWidth
+	x := x0 + 5
 	printString(ui.vx, &x, y, s.StyledString())
 	x += 2
 
