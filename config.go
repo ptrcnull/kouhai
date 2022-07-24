@@ -103,7 +103,6 @@ type Config struct {
 	Highlights       []string
 	OnHighlightPath  string
 	OnHighlightBeep  bool
-	NickColWidth     int
 	ChanColWidth     int
 	ChanColEnabled   bool
 	MemberColWidth   int
@@ -140,7 +139,6 @@ func Defaults() Config {
 		Highlights:       nil,
 		OnHighlightPath:  "",
 		OnHighlightBeep:  false,
-		NickColWidth:     14,
 		ChanColWidth:     16,
 		ChanColEnabled:   true,
 		MemberColWidth:   16,
@@ -288,14 +286,7 @@ func unmarshal(filename string, cfg *Config) (err error) {
 			for _, child := range d.Children {
 				switch child.Name {
 				case "nicknames":
-					var nicknames string
-					if err := child.ParseParams(&nicknames); err != nil {
-						return err
-					}
-
-					if cfg.NickColWidth, err = strconv.Atoi(nicknames); err != nil {
-						return err
-					}
+					// ignored
 				case "channels":
 					var channelsStr string
 					if err := child.ParseParams(&channelsStr); err != nil {

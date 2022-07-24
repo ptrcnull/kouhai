@@ -150,7 +150,6 @@ func NewApp(cfg Config) (app *App, err error) {
 	mouse := cfg.Mouse
 
 	app.win, err = ui.New(ui.Config{
-		NickColWidth:     cfg.NickColWidth,
 		ChanColWidth:     cfg.ChanColWidth,
 		ChanColEnabled:   cfg.ChanColEnabled,
 		MemberColWidth:   cfg.MemberColWidth,
