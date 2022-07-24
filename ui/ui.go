@@ -11,7 +11,6 @@ import (
 )
 
 type Config struct {
-	NickColWidth     int
 	ChanColWidth     int
 	ChanColEnabled   bool
 	MemberColWidth   int
@@ -451,7 +450,7 @@ func (ui *UI) InputBackSearch() {
 
 func (ui *UI) Resize() {
 	w, h := ui.screen.Size()
-	innerWidth := w - 9 - ui.channelWidth - ui.config.NickColWidth - ui.memberWidth
+	innerWidth := w - 9 - ui.channelWidth - ui.memberWidth
 	if innerWidth <= 0 {
 		innerWidth = 1 // will break display somewhat, but this is an edge case
 	}
@@ -484,13 +483,20 @@ func (ui *UI) Notify(title string, body string) {
 func (ui *UI) Draw(members []irc.Member) {
 	w, h := ui.screen.Size()
 
+	promptX := ui.channelWidth
+	editorX := promptX + 9 // width of time column
+	editorY := h - 1
+	statusBarY := h - 2
+	// if vertical, move editor and status 1 up
 	if ui.channelWidth == 0 {
-		ui.e.Draw(ui.screen, 9+ui.config.NickColWidth, h-2)
-	} else {
-		ui.e.Draw(ui.screen, 9+ui.channelWidth+ui.config.NickColWidth, h-1)
+		editorY -= 1
+		statusBarY -= 1
 	}
 
-	ui.bs.DrawTimeline(ui.screen, ui.channelWidth, 0, ui.config.NickColWidth)
+	printString(ui.screen, &promptX, editorY, Styled("       > ", tcell.StyleDefault.Foreground(tcell.ColorRed)))
+	ui.e.Draw(ui.screen, editorX, editorY)
+
+	ui.bs.DrawTimeline(ui.screen, ui.channelWidth, 0)
 	if ui.channelWidth == 0 {
 		ui.bs.DrawHorizontalBufferList(ui.screen, 0, h-1, w-ui.memberWidth, &ui.channelOffset)
 	} else {
@@ -499,22 +505,11 @@ func (ui *UI) Draw(members []irc.Member) {
 	if ui.memberWidth != 0 {
 		ui.drawVerticalMemberList(ui.screen, w-ui.memberWidth, 0, ui.memberWidth, h, members, &ui.memberOffset)
 	}
+
 	if ui.channelWidth == 0 {
 		ui.drawStatusBar(ui.channelWidth, h-3, w-ui.memberWidth)
 	} else {
 		ui.drawStatusBar(ui.channelWidth, h-2, w-ui.channelWidth-ui.memberWidth)
-	}
-
-	if ui.channelWidth == 0 {
-		for x := 0; x < 9+ui.config.NickColWidth; x++ {
-			ui.screen.SetContent(x, h-2, ' ', nil, tcell.StyleDefault)
-		}
-		printIdent(ui.screen, 7, h-2, ui.config.NickColWidth, ui.prompt)
-	} else {
-		for x := ui.channelWidth; x < 9+ui.channelWidth+ui.config.NickColWidth; x++ {
-			ui.screen.SetContent(x, h-1, ' ', nil, tcell.StyleDefault)
-		}
-		printIdent(ui.screen, ui.channelWidth+7, h-1, ui.config.NickColWidth, ui.prompt)
 	}
 
 	ui.screen.Show()
@@ -547,7 +542,7 @@ func (ui *UI) drawStatusBar(x0, y, width int) {
 	s.SetStyle(tcell.StyleDefault.Foreground(tcell.ColorGray))
 	s.WriteString("--")
 
-	x := x0 + 5 + ui.config.NickColWidth
+	x := x0 + 5
 	printString(ui.screen, &x, y, s.StyledString())
 	x += 2
 
