@@ -927,9 +927,9 @@ func (bs *BufferList) DrawHorizontalBufferList(vx *Vaxis, x0, y0, width int, off
 	}
 }
 
-func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
+func (bs *BufferList) DrawTimeline(ui *UI, x0, y0 int) {
 	vx := ui.vx
-	clearArea(vx, x0, y0, bs.tlInnerWidth+nickColWidth+9, bs.tlHeight+2)
+	clearArea(vx, x0, y0, bs.tlInnerWidth+9, bs.tlHeight+2)
 
 	b := bs.cur()
 	if !b.openedOnce {
@@ -942,7 +942,7 @@ func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
 	xTopic := x0
 	printString(vx, &xTopic, y0, Styled(b.topic, vaxis.Style{}))
 	y0++
-	drawHorizontalLine(vx, x0, y0, bs.tlInnerWidth+nickColWidth+9)
+	drawHorizontalLine(vx, x0, y0, bs.tlInnerWidth+9)
 	y0++
 
 	if bs.textWidth < bs.tlInnerWidth {
@@ -956,7 +956,7 @@ func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
 			break
 		}
 
-		x1 := x0 + 9 + nickColWidth
+		x1 := x0 + 9
 
 		line := &b.lines[i]
 		nls := line.NewLines(bs.ui.vx, bs.textWidth)
@@ -968,8 +968,8 @@ func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
 				st := vaxis.Style{
 					Foreground: ColorGray,
 				}
-				printIdent(vx, x0+7, yi, nickColWidth, Styled("--", st))
-				drawHorizontalLine(vx, x0, yi, 9+nickColWidth+bs.tlInnerWidth)
+				printIdent(vx, x0+7, yi, 0, Styled("--", st))
+				drawHorizontalLine(vx, x0, yi, 9+bs.tlInnerWidth)
 				rulerDrawn = true
 			}
 		}
