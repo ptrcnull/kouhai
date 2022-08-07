@@ -70,6 +70,7 @@ type Config struct {
 	MemberColWidth   int
 	MemberColEnabled bool
 	TextMaxWidth     int
+	SimpleArrow      bool
 
 	Colors ConfigColors
 
@@ -104,6 +105,7 @@ func Defaults() (cfg Config, err error) {
 		MemberColWidth:   16,
 		MemberColEnabled: true,
 		TextMaxWidth:     0,
+		SimpleArrow:      false,
 		Colors: ConfigColors{
 			Prompt: tcell.ColorDefault,
 			Unread: tcell.ColorDefault,
@@ -292,6 +294,15 @@ func unmarshal(filename string, cfg *Config) (err error) {
 			}
 
 			if cfg.Mouse, err = strconv.ParseBool(mouse); err != nil {
+				return err
+			}
+		case "simple-arrow":
+			var simpleArrow string
+			if err := d.ParseParams(&simpleArrow); err != nil {
+				return err
+			}
+
+			if cfg.SimpleArrow, err = strconv.ParseBool(simpleArrow); err != nil {
 				return err
 			}
 		case "colors":

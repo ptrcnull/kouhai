@@ -724,7 +724,11 @@ func (app *App) handleIRCEvent(netID string, ev interface{}) {
 		}
 	case irc.SelfNickEvent:
 		var body ui.StyledStringBuilder
-		body.WriteString(fmt.Sprintf("%s\u2192%s", ev.FormerNick, s.Nick()))
+		arrow := "\u2192"
+		if app.cfg.SimpleArrow {
+			arrow = "->"
+		}
+		body.WriteString(fmt.Sprintf("%s%s%s", ev.FormerNick, arrow, s.Nick()))
 		textStyle := tcell.StyleDefault.Foreground(tcell.ColorGray)
 		arrowStyle := tcell.StyleDefault
 		body.AddStyle(0, textStyle)
@@ -1083,7 +1087,11 @@ func (app *App) formatEvent(ev irc.Event) ui.Line {
 	switch ev := ev.(type) {
 	case irc.UserNickEvent:
 		var body ui.StyledStringBuilder
-		body.WriteString(fmt.Sprintf("%s\u2192%s", ev.FormerNick, ev.User))
+		arrow := "\u2192"
+		if app.cfg.SimpleArrow {
+			arrow = "->"
+		}
+		body.WriteString(fmt.Sprintf("%s%s%s", ev.FormerNick, arrow, ev.User))
 		textStyle := tcell.StyleDefault.Foreground(tcell.ColorGray)
 		arrowStyle := tcell.StyleDefault
 		body.AddStyle(0, textStyle)

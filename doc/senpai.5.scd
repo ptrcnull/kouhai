@@ -144,6 +144,9 @@ pane-widths {
 *mouse*
 	Enable or disable mouse support.  Defaults to true.
 
+*simple-arrow*
+	Use ASCII arrow "->" instead of \u2192 (→). Defaults to false.
+
 *colors* { ... }
 	Settings for colors of different UI elements.
 
