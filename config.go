@@ -100,15 +100,16 @@ type Config struct {
 	Typings bool
 	Mouse   bool
 
-	Highlights       []string
-	OnHighlightPath  string
-	OnHighlightBeep  bool
-	ChanColWidth     int
-	ChanColEnabled   bool
-	MemberColWidth   int
-	MemberColEnabled bool
-	TextMaxWidth     int
-	StatusEnabled    bool
+	Highlights        []string
+	OnHighlightPath   string
+	OnHighlightBeep   bool
+	OnHighlightNotify bool
+	ChanColWidth      int
+	ChanColEnabled    bool
+	MemberColWidth    int
+	MemberColEnabled  bool
+	TextMaxWidth      int
+	StatusEnabled     bool
 
 	Colors ui.ConfigColors
 
@@ -126,25 +127,26 @@ func DefaultHighlightPath() (string, error) {
 
 func Defaults() Config {
 	return Config{
-		Addr:             "",
-		Nick:             "",
-		Real:             "",
-		User:             "",
-		Password:         nil,
-		TLS:              true,
-		TLSSkipVerify:    false,
-		Channels:         nil,
-		Typings:          true,
-		Mouse:            true,
-		Highlights:       nil,
-		OnHighlightPath:  "",
-		OnHighlightBeep:  false,
-		ChanColWidth:     16,
-		ChanColEnabled:   true,
-		MemberColWidth:   16,
-		MemberColEnabled: true,
-		TextMaxWidth:     0,
-		StatusEnabled:    true,
+		Addr:              "",
+		Nick:              "",
+		Real:              "",
+		User:              "",
+		Password:          nil,
+		TLS:               true,
+		TLSSkipVerify:     false,
+		Channels:          nil,
+		Typings:           true,
+		Mouse:             true,
+		Highlights:        nil,
+		OnHighlightPath:   "",
+		OnHighlightBeep:   false,
+		OnHighlightNotify: true,
+		ChanColWidth:      16,
+		ChanColEnabled:    true,
+		MemberColWidth:    16,
+		MemberColEnabled:  true,
+		TextMaxWidth:      0,
+		StatusEnabled:     true,
 		Colors: ui.ConfigColors{
 			Status: tcell.ColorGray,
 			Prompt: tcell.ColorDefault,
@@ -280,6 +282,15 @@ func unmarshal(filename string, cfg *Config) (err error) {
 			}
 
 			if cfg.OnHighlightBeep, err = strconv.ParseBool(onHighlightBeep); err != nil {
+				return err
+			}
+		case "on-highlight-notify":
+			var onHighlightNotify string
+			if err := d.ParseParams(&onHighlightNotify); err != nil {
+				return err
+			}
+
+			if cfg.OnHighlightNotify, err = strconv.ParseBool(onHighlightNotify); err != nil {
 				return err
 			}
 		case "pane-widths":

@@ -68,6 +68,12 @@ Some settings are required, the others are optional.
 	Enable sending the bell character (BEL) when you are highlighted.
 	Defaults to disabled.
 
+*on-highlight-notify*
+	Enable sending desktop notifications when you are highlighted.
+	This is supported on some modern terminals, like foot or urxvt,
+	via "OSC 777;notify".
+	Defaults to enabled.
+
 *on-highlight-path*
 	Alternative path to a shell script to be executed when you are highlighted.
 	By default, senpai looks for a highlight shell script at

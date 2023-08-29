@@ -1210,10 +1210,12 @@ func (app *App) notifyHighlight(buffer, nick, content string, current bool) {
 	if app.cfg.OnHighlightBeep {
 		app.win.Beep()
 	}
-	if buffer != nick {
-		app.win.Notify(fmt.Sprintf("%s — %s", buffer, nick), content)
-	} else {
-		app.win.Notify(nick, content)
+	if app.cfg.OnHighlightNotify {
+		if buffer != nick {
+			app.win.Notify(fmt.Sprintf("%s — %s", buffer, nick), content)
+		} else {
+			app.win.Notify(nick, content)
+		}
 	}
 
 	if app.cfg.Transient {
