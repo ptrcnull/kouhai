@@ -1187,7 +1187,7 @@ func (app *App) notifyHighlight(buffer, nick, content string) {
 		return
 	}
 	here := "0"
-	if buffer == curBuffer { // TODO also check netID
+	if strings.EqualFold(buffer, curBuffer) { // TODO also check netID
 		here = "1"
 	}
 	cmd := exec.Command(path)
