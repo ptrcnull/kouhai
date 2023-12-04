@@ -1,5 +1,12 @@
 ![](res/icon.128.png) ![](res/logo.png)
 
+> # ⚠️ Migrated to sr.ht/~delthas
+>
+> **This project has [migrated to sr.ht/~delthas](https://git.sr.ht/~delthas/senpai/).**
+>
+> **This repository is archived and will not receive future updates.**
+---
+
 *Welcome home, desune~*
 
 **A modern terminal IRC client.**
